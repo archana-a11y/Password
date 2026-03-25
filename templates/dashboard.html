@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Password Manager</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #007bff;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+
+        .logout {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Container */
+        .container {
+            padding: 30px;
+        }
+
+        /* Form Box */
+        .form-box {
+            background: white;
+            padding: 20px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-box h3 {
+            margin-top: 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .edit {
+            background: #ffc107;
+        }
+
+        .delete {
+            background: #dc3545;
+        }
+
+        .toggle {
+            background: #6c757d;
+            cursor: pointer;
+        }
+
+        /* Messages */
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .error {
+            background-color: #ffdddd;
+            color: #d8000c;
+        }
+
+        .success {
+            background-color: #ddffdd;
+            color: #4F8A10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <h2>Password Manager</h2>
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+
+    <div class="container">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Add Password -->
+        <div class="form-box">
+            <h3>Add New Password</h3>
+            <form method="POST">
+                <input type="text" name="website" placeholder="Website" required>
+                <input type="text" name="username" placeholder="Username / Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+
+                <button type="submit">Save Password</button>
+            </form>
+        </div>
+
+        <!-- Password Table -->
+        <h3>Saved Passwords</h3>
+
+        <table>
+            <tr>
+                <th>Website</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for p in passwords %}
+            <tr>
+                <td>{{ p.website }}</td>
+                <td>{{ p.username }}</td>
+
+                <!-- Password with toggle -->
+                <td>
+                    <span id="pwd{{ p.id }}" data-password="{{ p.password }}">••••••</span>
+                    <button class="btn toggle" onclick="togglePassword('{{ p.id }}')">Show</button>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                    <a href="/edit/{{ p.id }}" class="btn edit">Edit</a>
+                    <a href="/delete/{{ p.id }}" class="btn delete"
+                       onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function togglePassword(id) {
+            let el = document.getElementById("pwd" + id);
+            let real = el.getAttribute("data-password");
+
+            if (el.innerText === "••••••") {
+                el.innerText = real;
+            } else {
+                el.innerText = "••••••";
+            }
+        }
+    </script>
+
+</body>
+</html>
